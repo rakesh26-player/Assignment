@@ -1,3 +1,4 @@
+// FlatDetailsCard.jsx
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, MapPin, Info, Sparkles } from "lucide-react";
 
@@ -33,34 +34,33 @@ export default function FlatDetailsCard({ property = {} }) {
   };
 
   const roomAmenities = [
-    { name: "AC", icon: "@" },
-    { name: "Wardrobe", icon: "@" },
-    { name: "Study Table", icon: "@" },
-    { name: "AC", icon: "@" },
+    { name: "AC", icon: "❄️" },
+    { name: "Wardrobe", icon: "🧥" },
+    { name: "Study Table", icon: "🪑" },
   ];
 
   const flatAmenities = [
-    { name: "RO", icon: "@" },
-    { name: "TV", icon: "@" },
+    { name: "RO", icon: "🚰" },
+    { name: "TV", icon: "📺" },
   ];
 
-  const societyAmenities = [{ name: "Pool", icon: "@" }];
+  const societyAmenities = [{ name: "Pool", icon: "🏊" }];
 
   const flatmates = [
-    { id: 1, avatar: "/placeholder.png" },
-    { id: 2, avatar: "/placeholder.png" },
+    { id: 1, avatar: "/p1.jpg" },
+    { id: 2, avatar: "/p2.jpg" },
     { id: 3, avatar: "/placeholder.png" },
   ];
 
   return (
-    <div className="w-full max-w-[1240px] h-[528px] bg-gray-200 rounded-[40px] shadow-lg flex flex-col overflow-hidden">
+    <div style={{ backgroundColor: 'rgba(245, 245, 245, 1)' }} className="w-full max-w-[1240px] h-[528px] rounded-[40px] shadow-lg flex flex-col overflow-hidden">
       <div className="w-full h-1/2 flex">
         {/* Image Carousel */}
-        <div className="relative w-full bg-gray-100">
+        <div className="relative w-full bg-gray-100 m-5">
           <img
-            src={images[currentImage] || "/images/flat1.jpg"}
+            src={images[currentImage]}
             alt="Flat"
-            className="w-full h-full object-cover rounded-tl-[40px]"
+            className="w-full h-full object-cover rounded-xl"
           />
 
           <button
@@ -94,9 +94,7 @@ export default function FlatDetailsCard({ property = {} }) {
                   e.stopPropagation();
                   setCurrentImage(index);
                 }}
-                className={`w-2 h-2 rounded-full ${
-                  index === currentImage ? "bg-orange-500" : "bg-white"
-                }`}
+                className={`w-2 h-2 rounded-full ${index === currentImage ? "bg-orange-500" : "bg-white"}`}
               />
             ))}
           </div>
@@ -118,7 +116,7 @@ export default function FlatDetailsCard({ property = {} }) {
       </div>
 
       <div className="w-full h-1/2 flex justify-between">
-        <div className="p-2 m-5 w-1/3 bg-white rounded-lg">
+        <div className="p-2 m-3 w-1/3 bg-white rounded-lg">
           <div className="space-y-4">
             <div>
               <p className="text-sm text-gray-500">Rent</p>
@@ -143,7 +141,7 @@ export default function FlatDetailsCard({ property = {} }) {
             <p className="text-sm text-gray-500 mb-2">Room Amenities</p>
             <div className="flex flex-wrap gap-2">
               {roomAmenities.map((amenity, index) => (
-                <div key={index} className="bg-orange-50 text-xs px-3 py-1 rounded-full flex items-center">
+                <div key={index} style={{ backgroundColor: 'rgba(254, 244, 224, 1)' }} className="text-xs px-3 py-1 rounded-full flex items-center">
                   <span className="mr-1">{amenity.icon}</span>
                   {amenity.name}
                 </div>
@@ -201,7 +199,7 @@ export default function FlatDetailsCard({ property = {} }) {
               {flatmates.map((flatmate) => (
                 <div key={flatmate.id} className="w-10 h-10 rounded-full border-2 border-white overflow-hidden">
                   <img
-                    src={flatmate.avatar || "/placeholder.png"}
+                    src={flatmate.avatar || "/p2.jpg"}
                     alt="Flatmate"
                     className="w-full h-full object-cover"
                   />

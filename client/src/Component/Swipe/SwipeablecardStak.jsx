@@ -1,105 +1,57 @@
 import { useState, useRef } from "react";
-import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  AnimatePresence,
+} from "framer-motion";
 import { ThumbsUp, ThumbsDown, X } from "lucide-react";
-import FlatDetailsCard from "../Cards/Flatdetailscard"; 
+import FlatDetailsCard from "../Cards/Flatdetailscard";
 import Navbar from "../Navbar/Navbar";
 
-const generateProperties = (count = 100) => {
-  const locations = [
-    "HSR Layout, Bangalore",
-    "Koramangala, Bangalore",
-    "Indiranagar, Bangalore",
-    "JP Nagar, Bangalore",
-    "Whitefield, Bangalore",
-    "Electronic City, Bangalore",
-    "Marathahalli, Bangalore",
-    "BTM Layout, Bangalore",
-  ];
-
-  const societies = [
-    "BM Mystic Greens",
-    "Green Valley",
-    "Sunshine Apartments",
-    "Royal Residency",
-    "Palm Grove",
-    "Urban Oasis",
-    "Serene Heights",
-    "Lakeside View",
-  ];
-
-  const properties = [];
-  for (let i = 1; i <= count; i++) {
-    const bhk = Math.floor(Math.random() * 3) + 1;
-    const locationIndex = Math.floor(Math.random() * locations.length);
-    const societyIndex = Math.floor(Math.random() * societies.length);
-    const rent = `${Math.floor(Math.random() * 30) + 10}K`;
-    const deposit = `${Math.floor(Math.random() * 60) + 20}K`;
-    const extra = `${Math.floor(Math.random() * 5) + 1}K`;
-    const day = Math.floor(Math.random() * 28) + 1;
-    const months = ["May", "June", "July"];
-    const month = months[Math.floor(Math.random() * months.length)];
-
-    properties.push({
-      id: i,
-      title: `${bhk}BHK Flat in ${locations[locationIndex].split(",")[0]}`,
-      location: `${societies[societyIndex]}, Sector ${Math.floor(Math.random() * 10) + 1}, ${locations[locationIndex]}`,
-      rent,
-      deposit,
-      extra,
-      accommodationType: `${bhk} BHK`,
-      roomType: "Private",
-      availability: `${day} ${month}`,
-    });
-  }
-  return properties;
-};
-
 export default function SwipeableCardStack() {
-  const [properties] = useState(generateProperties());
-  const [cards, setCards] = useState(properties);
-  const [likedProperties, setLikedProperties] = useState([]);
-  const [dislikedProperties, setDislikedProperties] = useState([]);
+  const [cards, setCards] = useState(Array.from({ length: 100 }, (_, i) => i + 1));
   const [showLikeOverlay, setShowLikeOverlay] = useState(false);
+  const [exitDirection, setExitDirection] = useState(null);
 
   const removeCard = (id, direction) => {
-    setCards((prev) => prev.filter((card) => card.id !== id));
-    const property = properties.find((prop) => prop.id === id);
+    setExitDirection(direction);
+    setCards((prev) => prev.filter((cardId) => cardId !== id));
 
     if (direction === "right") {
-      setLikedProperties((prev) => [...prev, property]);
       setShowLikeOverlay(true);
       setTimeout(() => setShowLikeOverlay(false), 1000);
-    } else {
-      setDislikedProperties((prev) => [...prev, property]);
     }
   };
 
   return (
     <div className="relative h-screen flex flex-col items-center bg-gray-100 overflow-hidden">
-      <div className="w-full  p-2 mb-2 ">
+      <div className="w-full flex justify-between items-center mb-4">
         <Navbar />
       </div>
+
       <AnimatePresence>
         {showLikeOverlay && (
           <motion.div
             className="absolute inset-0 top-[72px] bg-orange-500 bg-opacity-20 pointer-events-none z-10"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: 0.7 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2 }}
           />
         )}
       </AnimatePresence>
 
       <div className="relative w-full max-w-[1240px] h-[528px] flex items-center justify-center z-0">
-        <AnimatePresence>
-          {cards.slice(0, 3).map((card, index) => (
+        <AnimatePresence mode="popLayout">
+          {cards.slice(0, 3).map((id, index) => (
             <SwipeableCard
-              key={card.id}
-              card={card}
+              key={id}
+              id={id}
               active={index === 0}
               removeCard={removeCard}
               zIndex={3 - index}
+              exitDirection={exitDirection}
             />
           ))}
         </AnimatePresence>
@@ -123,58 +75,124 @@ export default function SwipeableCardStack() {
 
       <div className="flex items-center justify-center space-x-6 mt-6 z-20">
         <button
-          className="w-14 h-14 rounded-full bg-white shadow-md flex items-center justify-center"
-          onClick={() => cards.length > 0 && removeCard(cards[0].id, "left")}
+          className="w-14 h-14 rounded-full bg-black shadow-md flex items-center justify-center"
+          onClick={() => {
+            if (cards.length > 0) {
+              setExitDirection("left");
+              removeCard(cards[0], "left");
+            }
+          }}
         >
-          <ThumbsDown className="w-6 h-6 text-gray-500" />
+          <ThumbsDown className="w-6 h-6 text-white" />
         </button>
         <button
           className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center"
-          onClick={() => cards.length > 0 && setCards((prev) => prev.slice(1))}
+          onClick={() => {
+            if (cards.length > 0) {
+              setExitDirection(null);
+              setCards((prev) => prev.slice(1));
+            }
+          }}
         >
           <X className="w-5 h-5 text-gray-400" />
         </button>
         <button
-          className="w-14 h-14 rounded-full bg-white shadow-md flex items-center justify-center"
-          onClick={() => cards.length > 0 && removeCard(cards[0].id, "right")}
+          style={{ backgroundColor: "rgba(237, 101, 48, 1)" }}
+          className="w-14 h-14 rounded-full shadow-md flex items-center justify-center"
+          onClick={() => {
+            if (cards.length > 0) {
+              setExitDirection("right");
+              removeCard(cards[0], "right");
+            }
+          }}
         >
-          <ThumbsUp className="w-6 h-6 text-orange-500" />
+          <ThumbsUp className="w-6 h-6 text-white" />
         </button>
       </div>
     </div>
   );
 }
 
-function SwipeableCard({ card, active, removeCard, zIndex }) {
+function SwipeableCard({ id, active, removeCard, zIndex, exitDirection }) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-300, 0, 300], [-15, 0, 15]);
   const opacity = useTransform(x, [-300, -100, 0, 100, 300], [0, 1, 1, 1, 0]);
   const likeOpacity = useTransform(x, [0, 100, 300], [0, 1, 1]);
   const dislikeOpacity = useTransform(x, [-300, -100, 0], [1, 1, 0]);
+
   const cardRef = useRef(null);
+  const [isExiting, setIsExiting] = useState(false);
+  const [swipeDirection, setSwipeDirection] = useState(null);
 
   const handleDragEnd = (_, info) => {
-    if (active) {
+    if (active && !isExiting) {
       const threshold = 100;
       if (info.offset.x > threshold) {
-        removeCard(card.id, "right");
+        setIsExiting(true);
+        setSwipeDirection("right");
+        removeCard(id, "right");
       } else if (info.offset.x < -threshold) {
-        removeCard(card.id, "left");
+        setIsExiting(true);
+        setSwipeDirection("left");
+        removeCard(id, "left");
       }
     }
+  };
+
+  const exitVariants = {
+    left: {
+      x: -1500,
+      opacity: 0,
+      transition: { duration: 0.5, ease: [0.32, 0.72, 0.24, 0.99] },
+    },
+    right: {
+      x: 1500,
+      opacity: 0,
+      transition: { duration: 0.5, ease: [0.32, 0.72, 0.24, 0.99] },
+    },
+    default: {
+      opacity: 0,
+      scale: 0.5,
+      transition: { duration: 0.2 },
+    },
   };
 
   return (
     <motion.div
       ref={cardRef}
       className="absolute w-full max-w-[1240px] cursor-grab"
-      style={{ x, rotate, opacity, zIndex, position: "absolute", top: 0 }}
-      drag={active ? "x" : false}
+      style={{
+        x: isExiting ? undefined : x,
+        rotate: isExiting ? 0 : rotate,
+        opacity: isExiting ? undefined : opacity,
+        zIndex,
+        position: "absolute",
+        top: 0,
+      }}
+      drag={active && !isExiting ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
       onDragEnd={handleDragEnd}
-      initial={{ scale: active ? 1 : 0.95, y: active ? 0 : 10, opacity: active ? 1 : 0.7 }}
-      animate={{ scale: active ? 1 : 0.95, y: active ? 0 : 10, opacity: active ? 1 : 0.7 }}
-      exit={{ x: x.get() < 0 ? -500 : 500, opacity: 0, transition: { duration: 0.2 } }}
+      initial={{
+        scale: active ? 1 : 0.95,
+        y: active ? 0 : 10,
+        opacity: active ? 1 : 0.7,
+      }}
+      animate={{
+        scale: active ? 1 : 0.95,
+        y: active ? 0 : 10,
+        opacity: active ? 1 : 0.7,
+      }}
+      exit={
+        swipeDirection === "left"
+          ? exitVariants.left
+          : swipeDirection === "right"
+          ? exitVariants.right
+          : exitDirection === "left"
+          ? exitVariants.left
+          : exitDirection === "right"
+          ? exitVariants.right
+          : exitVariants.default
+      }
       transition={{ type: "spring", damping: 50, stiffness: 500 }}
       whileTap={{ cursor: "grabbing" }}
     >
@@ -192,7 +210,7 @@ function SwipeableCard({ card, active, removeCard, zIndex }) {
         <ThumbsDown className="w-12 h-12 text-white" />
       </motion.div>
 
-      <FlatDetailsCard property={card} />
+      <FlatDetailsCard />
     </motion.div>
   );
 }
